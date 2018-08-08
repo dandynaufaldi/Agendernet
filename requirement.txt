@@ -1,0 +1,9 @@
+pandas
+scipy
+numpy
+tensorflow-gpu
+mxnet-cu90
+scikit-learn
+tqdm
+scikit-image
+cython
