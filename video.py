@@ -22,7 +22,7 @@ ap.add_argument("-d", "--display", type=int, default=-1,
     help="Whether or not frames should be displayed")
 args = vars(ap.parse_args())
 
-def getPosFromRect(rect):
+def get_pos_from_rect(rect):
     return (rect.left(), rect.top(), rect.right(), rect.bottom())
 
 def get_result(X):
@@ -33,17 +33,20 @@ def main():
     print("[INFO] sampling frames...")
     detector = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor('model/shape_predictor_5_face_landmarks.dat')
-    time.sleep(1.0)
-    stream = cv2.VideoCapture("data/[MV] Fortune Cookie in Love (Fortune Cookie Yang Mencinta) - JKT48.mp4")
+    time.sleep(2.0)
+    stream = cv2.VideoCapture("data/nogizaka46_live.mp4")
     # stream = WebcamVideoStream("data/[MV] Fortune Cookie in Love (Fortune Cookie Yang Mencinta) - JKT48.mp4").start()
+    
     fps = FPS().start()
-    # frame = stream.read()
     start = time.time()
-    mot_tracker = Sort()
+    mot_tracker = Sort(max_age=5)
     while fps._numFrames < args['num_frames']:
         grabbed, frame = stream.read()
         frame = cv2.resize(frame, (640, 360))
         rects = detector(frame, 0)
+        dets = np.array([get_pos_from_rect(rect) for rect in rects])
+        ages = np.empty((len(dets)))
+        genders = np.empty((len(dets)))
         if len(rects) > 0 :
             shapes = dlib.full_object_detections()
             for rect in rects:
@@ -53,11 +56,15 @@ def main():
             faces = model.prep_image(faces)
             result = get_result(faces)
             genders, ages = model.decode_prediction(result)
-            genders = np.where(genders == 0, 'F', 'M')
-            for (i, rect) in enumerate(rects):
-                (left, top, right, bottom) = getPosFromRect(rect)
-                cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
-                cv2.putText(frame, "{:.0f}, {}".format(ages[i], genders[i]), (left - 10, top - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
+        mot_tracker.update(dets, ages, genders)
+        for tracker in mot_tracker.trackers:
+            (left, top, right, bottom) = convert_x_to_bbox(tracker.kf.x[:4, :]).astype('int').flatten()
+            cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
+            age = tracker.smooth_age()
+            gender = 'M' if tracker.smooth_gender() == 1 else 'F'
+            cv2.putText(frame, "id: {} {} {}".format(tracker.id, gender, age), (left - 10, top - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 2)
+            # print('bbox', tracker.kf.x[:4, :].flatten())
         
         if args["display"] > 0:
             cv2.imshow("Frame", frame)
