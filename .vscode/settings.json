@@ -1,0 +1,9 @@
+{
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+    "python.formatting.provider": "autopep8",
+    "autoDocstring.docstringFormat": "numpy",
+    "autoDocstring.includeDescription": true,
+    "autoDocstring.includeName": false,
+    "autoDocstring.newlineBeforeSummary": false
+}

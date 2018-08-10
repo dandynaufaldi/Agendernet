@@ -3,7 +3,6 @@ data/*.mp4
 **/__pycache__/
 *.py[cod]
 *$py.class
-.vscode/
 # C extensions
 *.so
 
