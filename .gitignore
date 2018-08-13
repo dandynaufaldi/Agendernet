@@ -1,4 +1,5 @@
 data/*.mp4
+model/weight/*.h5
 # Byte-compiled / optimized / DLL files
 **/__pycache__/
 *.py[cod]

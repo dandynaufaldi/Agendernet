@@ -14,7 +14,7 @@ class AgenderNetInceptionV3(Model):
         base = InceptionV3(
             input_shape=(140, 140, 3),
             include_top=False,
-            weights=None)
+            weights='weight/inception_v3_weights_tf_dim_ordering_tf_kernels_notop.h5')
         top_layer = GlobalAveragePooling2D(name='avg_pool')(base.output)
         gender_layer = Dense(2, activation='softmax', name='gender_prediction')(top_layer)
         age_layer = Dense(101, activation='softmax', name='age_prediction')(top_layer)
@@ -52,7 +52,6 @@ class AgenderNetInceptionV3(Model):
         age_predicted : numpy array
             Age from softmax regression
         """
-
         gender_predicted = np.argmax(prediction[0], axis=1)
         age_predicted = prediction[1].dot(np.arange(0, 101).reshape(101, 1)).flatten()
         return gender_predicted, age_predicted
@@ -71,7 +70,6 @@ class AgenderNetInceptionV3(Model):
         numpy ndarray
             Array of preprocessed image
         """
-
         data = data.astype('float16')
         data /= 127.5
         data -= 1.
