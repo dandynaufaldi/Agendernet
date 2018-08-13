@@ -121,6 +121,9 @@ class KalmanBoxTracker(object):
         self.age_preds.append(age_pred)
         self.kf.update(convert_bbox_to_z(bbox))
 
+        self.gender_preds = self.gender_preds[:20]
+        self.age_preds = self.age_preds[:20]
+
     def predict(self):
         """
         Advances the state vector and returns the predicted bounding box estimate.
