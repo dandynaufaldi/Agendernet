@@ -73,7 +73,7 @@ def make_from_utkface(path):
     result['full_path'] = result['full_path'].map(removedb)
     result['db_name'] = path
     result = result[['db_name', 'full_path', 'age', 'gender']]
-    result.to_csv('db/UTKface.csv', index=False)
+    result.to_csv('db/utkface.csv', index=False)
 
 
 def make_from_fgnet(path):
@@ -84,11 +84,11 @@ def make_from_fgnet(path):
         Path to FGNET dataset folder
     """
 
-    path = path + '/images/*.JPG'
-    paths = glob(path)
+    pattern = path + '/images/*.JPG'
+    paths = glob(pattern)
     data = pd.DataFrame()
-    data['db_name'] = path
     data['full_path'] = paths
+    data['db_name'] = path
     p = re.compile('[0-9]+')
 
     def get_age(row):
@@ -99,9 +99,9 @@ def make_from_fgnet(path):
     data['age'] = data['full_path'].map(get_age)
 
     def clean_path(row):
-        return row.split('/')[-1]
+        return '/'.join(row.split('/')[1:])
     data['full_path'] = data['full_path'].map(clean_path)
-    data.to_csv('db/FGNET.csv', columns=['db_name', 'full_path', 'age', 'gender'], index=False)
+    data.to_csv('db/fgnet.csv', columns=['db_name', 'full_path', 'age'], index=False)
 
 
 def make_from_adience(path):
