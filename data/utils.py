@@ -10,7 +10,7 @@ from tqdm import tqdm
 from scipy.io import loadmat
 
 
-def clean_data(db_frame):
+def clean_data(db_frame: pd.DataFrame):
     """
     Clean DataFrame from abnormal data
 
@@ -35,7 +35,7 @@ def clean_data(db_frame):
     return cleaned
 
 
-def resize_square_image(image, size=140):
+def resize_square_image(image: np.ndarray, size: int =140):
     """
     Resize image and make it square
 
@@ -66,10 +66,10 @@ def resize_square_image(image, size=140):
     return resized
 
 
-def align_one_face(image,
-                   padding=0.4,
-                   size=140,
-                   predictor_path='shape_predictor_5_face_landmarks.dat'):
+def align_one_face(image: np.ndarray,
+                   padding: float =0.4,
+                   size: int =140,
+                   predictor_path: str='shape_predictor_5_face_landmarks.dat'):
     """
     Get 1 aligned face from image if exist, else just resize
     Parameters
@@ -120,7 +120,7 @@ def get_year(mat_date):
     return year
 
 
-def load_data(db_name, path):
+def load_data(db_name: str, path: str):
     """
     Load data from .mat file (IMDB-Wiki dataset)
 

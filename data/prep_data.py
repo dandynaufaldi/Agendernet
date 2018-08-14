@@ -21,7 +21,7 @@ WORKER = args.num_worker
 predictor = dlib.shape_predictor('../model/shape_predictor_5_face_landmarks.dat')
 
 
-def align_and_save(path):
+def align_and_save(path: str):
     """
     Get aligned face and save to disk
 

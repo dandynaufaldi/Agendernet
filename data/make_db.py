@@ -15,7 +15,7 @@ parser.add_argument('--path',
                     help="Path to dataset folder")
 
 
-def make_from_imdb(path):
+def make_from_imdb(path: str):
     """Create .csv file as db from IMDB dataset
     Parameters
     ----------
@@ -29,7 +29,7 @@ def make_from_imdb(path):
     data.to_csv('db/imdb.csv',  columns=['db_name', 'full_path', 'age', 'gender'], index=False)
 
 
-def make_from_wiki(path):
+def make_from_wiki(path: str):
     """Create .csv file as db from Wiki dataset
     Parameters
     ----------
@@ -43,7 +43,7 @@ def make_from_wiki(path):
     data.to_csv('db/wiki.csv',  columns=['db_name', 'full_path', 'age', 'gender'], index=False)
 
 
-def make_from_utkface(path):
+def make_from_utkface(path: str):
     """Create .csv file as db from UTKface dataset
     Parameters
     ----------
@@ -76,7 +76,7 @@ def make_from_utkface(path):
     result.to_csv('db/utkface.csv', index=False)
 
 
-def make_from_fgnet(path):
+def make_from_fgnet(path: str):
     """Create .csv file as db from FGNET dataset
     Parameters
     ----------
@@ -91,20 +91,20 @@ def make_from_fgnet(path):
     data['db_name'] = path
     p = re.compile('[0-9]+')
 
-    def get_age(row):
+    def get_age(row: str):
         flname = row.split('/')[-1]
         age = flname.split('.')[0].split('A')[-1]
         age = p.match(age).group()
         return int(age)
     data['age'] = data['full_path'].map(get_age)
 
-    def clean_path(row):
+    def clean_path(row: str):
         return '/'.join(row.split('/')[1:])
     data['full_path'] = data['full_path'].map(clean_path)
     data.to_csv('db/fgnet.csv', columns=['db_name', 'full_path', 'age'], index=False)
 
 
-def make_from_adience(path):
+def make_from_adience(path: str):
     """Create .csv file as db from Adience dataset
     Parameters
     ----------
@@ -120,10 +120,10 @@ def make_from_adience(path):
     data['full_path'] = data['user_id'] + '/coarse_tilt_aligned_face.' + \
         data['face_id'].astype('str') + '.' + data['original_image']
 
-    def rnd(low, high):
+    def rnd(low: int, high: int):
         return np.random.randint(low, high + 1)
 
-    def makeAge(age):
+    def makeAge(age: int):
         if age == '(0, 2)':
             return rnd(0, 2)
         elif age == '(4, 6)':
