@@ -7,23 +7,21 @@ from keras import backend as K
 
 
 class AgenderSSRNet(Model):
+    """Soft Stagewise Regression Network
+
+    Parameters
+    ----------
+    image_size : int
+        size for image used as input
+    stage_num : list
+        list of stage number
+    lambda_local : float
+        local lambda
+    lambda_d : float
+        d lambda
+    """
+
     def __init__(self, image_size, stage_num, lambda_local, lambda_d):
-        """
-        Instatiate SSR-Net model
-
-        Parameters
-        ----------
-        image_size : int
-            size for image used as input
-        stage_num : list
-            list of stage number
-        lambda_local : float
-            local lambda
-        lambda_d : float
-            d lambda
-
-        """
-
         self.input_size = image_size
         if K.image_dim_ordering() == "th":
             self.__channel_axis = 1
