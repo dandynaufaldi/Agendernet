@@ -19,18 +19,69 @@ Datasets are saved in data/ directory
 - [Adience](https://talhassner.github.io/home/projects/Adience/Adience-data.html)
 - [UTKFace](https://susanqq.github.io/UTKFace/)
 - [FGNET](http://yanweifu.github.io/FG_NET_data/index.html)
+### Age Distribution
+![dist](docs/age_dist.png)
 
-## Preprocess
+## Preprocess (for training)
+For complete instruction, check on data/ directory
+- For IMDB and Wiki dataset remove any unsual data from its .mat file with following characteristics:
+    - Age is below 0 and above 100
+    - Face score is NaN
+    - Second face score is exist
+    - Missing gender label
+- Manual cleansing on IMDB-Wiki data with age 0-20 using [tools](https://github.com/dandynaufaldi/validation-tool)
+- Detect and align face using dlib with margin 0.4 (following [1] margin size)
+- Remove image which has no face detected or the face is unclear so it's not detected
+- Data normalization following each model requirement (in model's prep_image method)
 
+## Model
+Here we use 3 model
+### InceptionV3 and MobileNetV2
+We use InceptionV3 and MobileNetV2 from keras-application without it's classifier output and modify it to have 2 output layer. 
+One for gender prediction with 2 nodes and another for age prediction with 101 nodes (represent age 0-100).
+We treat age prediction as multiclass classification problem with it's output calculated from softmax regression as in [1] reference
+### SSR-Net
+We follow default SSR-Net architecture with some modification. At the top we have 1 classifier block which then feed into 2 classifier block. In SSR-Net, we treat prediction as regression problem for both age and gender 
 
 ## Train
-
-
+For InceptionV3 and MobileNetV2 we used pretrained weight from keras-application which was trained on ImageNet dataset. So, we do transfer learning on InceptionV3 and MobileNetV2. And, training from scratch on SSR-Net
+Training was done in AWS P3 instance with Nvidia Tesla V100 with 10 fold cross-validation and 50 epoch each to check for model consistency and get weight file with best metrics
+For each model, following input size is used:
+- InceptionV3 : 140 x 140 px
+- MobileNetV2 : 96 x 96 px
+- SSR-Net : 64 x 64 px
+Here is the training history
+### InceptionV3
+![log inceptionv3](docs/log_inceptionv3.jpg)
+### MobileNetV2
+![log mobilenetv2](docs/log_mobilenetv2.jpg)
+### SSR-Net
+![log ssrnet](docs/log_ssrnet.jpg)
 ## Evaluation
+For model performance evaluation, we use UTKFace and FGNET dataset. Here we also try age and gender model from InsightFace project which was build on ResNet50 architecture.
+We also crawl some Indonesian artist faces from wikipedia with total of 51 validated images
+Here is the result (model in top position hold the best score)
+### UTKFace Dataset
+![UTKFace Gender Acc Bar](docs/utk_gender_accbar.jpg)
+![UTKFace Age MAE](docs/utk_age_maebar.jpg)
+### FGNET Dataset
+![FGNET Age MAE](docs/fgnet_age_maebar.jpg)
+### Indonesian Face
+![Indonesia Gender Acc Bar](docs/indo_gender_accbar.jpg)
+![Indonesia Age MAE](docs/indo_age_maebar.jpg)
+### Inference time - performance score
+![inference](docs/infere_time.jpg)
 
+## Demo Video Stream
+Use `stream.py` to try the models. SORT tracker is integrated to add age and gender prediction smoothing for prediction result
+Usage :
+```bash
+usage: video.py [-h] [-s SRC]
 
-## Test
-
+optional arguments:
+  -h, --help         show this help message and exit
+  -s SRC, --src SRC  Video stream source, default will be webcam (0)
+```
 
 ## References and Acknowledgments
 This project is part of my internship program at [Nodeflux](https://nodeflux.io/) as data scientist from July - August, 2018
