@@ -14,12 +14,9 @@ from utils.sort import (
 )
 
 global model, graph
-# construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-n", "--num-frames", type=int, default=100,
-                help="# of frames to loop over for FPS test")
-ap.add_argument("-d", "--display", type=int, default=-1,
-                help="Whether or not frames should be displayed")
+ap.add_argument("-s", "--src", default=0,
+                help="Video stream source, default will be webcam (0)")
 args = vars(ap.parse_args())
 
 
@@ -39,17 +36,15 @@ def main():
     predictor = dlib.shape_predictor(
         'model/shape_predictor_5_face_landmarks.dat')
     time.sleep(2.0)
-    stream = cv2.VideoCapture("data/nogizaka46_live.mp4")
-    # stream = WebcamVideoStream("data/[MV] Fortune Cookie in Love (Fortune Cookie Yang Mencinta) - JKT48.mp4").start()
-
+    stream = WebcamVideoStream(args['src']).start()
     fps = FPS().start()
     start = time.time()
     mot_tracker = Sort()
-
-    while fps._numFrames < args['num_frames']:
-        grabbed, frame = stream.read()
-        frame = cv2.resize(frame, (640, 360))
-        rects = detector(frame, 0)
+    grabbed, frame = stream.read()
+    while grabbed:
+        frame = cv2.resize(frame, (1280, 720))
+        if fps._numFrames % 3 == 0:
+            rects = detector(frame, 0)
         dets = np.array([get_pos_from_rect(rect) for rect in rects])
         ages = np.empty((len(dets)))
         genders = np.empty((len(dets)))
@@ -72,21 +67,14 @@ def main():
             gender = 'M' if tracker.smooth_gender() == 1 else 'F'
             cv2.putText(frame, "id: {} {} {}".format(tracker.id, gender, age),
                         (left - 10, top - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 2)
-            # print('bbox', tracker.kf.x[:4, :].flatten())
-
-        if args["display"] > 0:
-            cv2.namedWindow("Frame", cv2.WINDOW_NORMAL)
-            cv2.imshow("Frame", frame)
-            key = cv2.waitKey(1) & 0xFF
-
+        cv2.putText(frame, "{:.1f} FPS".format(fps.fps()), (1100, 50),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+        cv2.namedWindow("Frame", cv2.WINDOW_NORMAL)
+        cv2.imshow("Frame", frame)
+        key = cv2.waitKey(1) & 0xFF
         fps.update()
+        grabbed, frame = stream.read()
     fps.stop()
-    print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
-    print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
-
-    # print('Frame fetched', stream._numFrames)
-    # print('Frame displayed', fps._numFrames)
-    print('Elapsed : {:.2f}'.format(time.time() - start))
     stream.release()
     cv2.destroyAllWindows()
 
