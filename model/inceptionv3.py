@@ -14,7 +14,8 @@ class AgenderNetInceptionV3(Model):
         base = InceptionV3(
             input_shape=(140, 140, 3),
             include_top=False,
-            weights='weight/inception_v3_weights_tf_dim_ordering_tf_kernels_notop.h5')
+            weights=os.path.dirname(
+                __file__)+'/weight/inception_v3_weights_tf_dim_ordering_tf_kernels_notop.h5')
         top_layer = GlobalAveragePooling2D(name='avg_pool')(base.output)
         gender_layer = Dense(2, activation='softmax', name='gender_prediction')(top_layer)
         age_layer = Dense(101, activation='softmax', name='age_prediction')(top_layer)
