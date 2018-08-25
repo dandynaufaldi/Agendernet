@@ -147,7 +147,7 @@ def make_from_adience(path: str):
     data['age'] = data['age'].map(makeAge)
     data['db_name'] = 'adience'
     data = data.loc[(~data['age'].isnull()) & ((data['gender'] == 'f') | (
-        data['gender'] == 'm')), ['db_name', 'full_path', 'umur', 'gender']]
+        data['gender'] == 'm')), ['db_name', 'full_path', 'age', 'gender']]
     gender = {'m': 1, 'f': 0}
     data['gender'] = data['gender'].map(gender)
     data.to_csv('db/adience.csv', index=False)
