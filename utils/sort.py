@@ -119,10 +119,10 @@ class KalmanBoxTracker(object):
         self.age_preds = [age_pred]
 
     def smooth_age(self):
-        return np.mean(self.age_preds).astype('int')
+        return int(np.mean(self.age_preds[:5]))
 
     def smooth_gender(self):
-        return np.mean(self.gender_preds).astype('int')
+        return int(np.mean(self.gender_preds[:5]))
 
     def update(self, bbox: np.ndarray, gender_pred: int, age_pred: float):
         """
@@ -136,8 +136,8 @@ class KalmanBoxTracker(object):
         self.age_preds.append(age_pred)
         self.kf.update(convert_bbox_to_z(bbox))
 
-        self.gender_preds = self.gender_preds[:20]
-        self.age_preds = self.age_preds[:20]
+        self.gender_preds = self.gender_preds[:5]
+        self.age_preds = self.age_preds[:5]
 
     def predict(self):
         """
@@ -210,7 +210,7 @@ class Sort(object):
         self.trackers = []
         self.frame_count = 0
 
-    def update(self, dets: np.ndarray, ages: np.ndarray, genders: np.ndarray):
+    def update(self, dets: np.ndarray, genders: np.ndarray, ages: np.ndarray):
         """
         Params:
             dets - a numpy array of detections in the format [[x1,y1,x2,y2,score],[x1,y1,x2,y2,score],...]
@@ -242,7 +242,7 @@ class Sort(object):
 
         # create and initialise new trackers for unmatched detections
         for i in unmatched_dets:
-            trk = KalmanBoxTracker(dets[i, :], ages[i], genders[i])
+            trk = KalmanBoxTracker(dets[i, :], genders[i], ages[i])
             self.trackers.append(trk)
         i = len(self.trackers)
         for trk in reversed(self.trackers):

@@ -58,7 +58,7 @@ def main():
             result = get_result(faces)
             genders, ages = model.decode_prediction(result)
 
-        mot_tracker.update(dets, ages, genders)
+        mot_tracker.update(dets, genders, ages)
         for tracker in mot_tracker.trackers:
             (left, top, right, bottom) = convert_x_to_bbox(
                 tracker.kf.x[:4, :]).astype('int').flatten()
