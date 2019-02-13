@@ -93,12 +93,11 @@ class InsightFace:
     def __init__(self):
         ctx = mx.gpu(0)
         self.image_size = (112, 112)
-        self.ga_model = get_model(ctx, self.image_size, os.path.dirname(
-            __file__)+'/weight/model-r34-age/model,0', 'fc1')
+        self.ga_model = get_model(ctx, self.image_size, os.path.dirname(os.path.abspath(__file__))+'/weight/model-r34-age/model,0', 'fc1')
         self.threshold = 1.24
         self.det_minsize = 50
         self.det_threshold = [0.6, 0.7, 0.8]
-        mtcnn_path = os.path.join(os.path.dirname(__file__), 'weight/mtcnn-model')
+        mtcnn_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'weight/mtcnn-model')
         detector = MtcnnDetector(model_folder=mtcnn_path, ctx=ctx, num_worker=1,
                                  accurate_landmark=True, threshold=[0.0, 0.0, 0.2])
         self.detector = detector
